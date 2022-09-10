@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper代理开发的规范
+1.Mapper接口接口的名称和对应Mapper.xml映射文件名称必须一直
+2.Mapper.xml文件的namespace与Mapper接口的类路径相同（即接口文件和映射文件需要放在同一包中）
+3.Mapper接口中的方法名和Mapper.xml中定义的每个执行语句的id相同
+4.Mapper接口中的输入参数类型和Mapper.xml中定义的每个sql的parameterType类型相同
+5.Mapper接口方法的输出参数类型要和Mapper.xml中定义的每个sql的resultType的类型相同 -->
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.dao.BuildingDao">
+    <!--查询所有的楼宇管理员-->
+    <select id="findAll" resultType="Building">
+        select * from building
+    </select>
+    <!--添加楼宇管理员-->
+    <insert id="addBuilding" parameterType="Building" >
+         insert into building(Building_Name,Building_Introduction)
+         values(#{Building_Name},#{Building_Introduction})
+    </insert>
+    <!--通过名字查询楼-->
+    <select id="findBuildingByName" parameterType="String" resultType="Building">
+         select * from building where Building_Name= #{Building_Name}
+    </select>
+    <!--通过id查询楼-->
+    <select id="findBuildingById" parameterType="Integer" resultType="Building">
+        select * from building where Building_ID= #{Building_ID}
+    </select>
+    <!--通过id修改楼宇管理员-->
+    <update id="BuildingUpdateSave" parameterType="Building">
+        update building
+        <set> <!-- 会去掉多余的逗号 -->
+            Building_Name=#{Building_Name},
+            Building_Introduction=#{Building_Introduction},
+        </set>
+        where Building_ID=#{Building_ID}
+    </update>
+    <!--通过名称查楼-->
+    <select id="findBuildingByName1" parameterType="String" resultType="Building">
+         select * from building where Building_Name= #{Building_Name}
+    </select>
+    <!--通过id删除楼宇-->
+    <delete id="deleteBuildingById" parameterType="Integer">
+         delete from building where Building_ID=#{Building_ID}
+    </delete>
+    <!--查询所有楼中的所有寝室-->
+    <select id="findAllBuildingAndDomitory" parameterType="Integer" resultMap="BuildingAndDomitory">
+        select d.* ,b.* from domitory
+		d ,building b
+		where b.Building_ID=d.Domitory_BuildingID
+    </select>
+    <!-- 自定义 手动映射类型 -->
+    <resultMap type="Building" id="BuildingAndDomitory">
+        <id property="Building_ID" column="Building_ID" />
+        <result property="Building_Name" column="Building_Name"/>
+        <result property="Building_Introduction" column="Building_Introduction"/>
+        <!-- 多对多关联映射 ：collection-->
+        <collection property="domitoryList" ofType="Domitory">
+            <id property="Domitory_ID" column="Domitory_ID" />
+            <result property="Domitory_BuildingID" column="Domitory_BuildingID"/>
+            <result property="Domitory_Name" column="Domitory_Name"/>
+            <result property="Domitory_Number" column="Domitory_Number"/>
+            <result property="Domitory_NullNumber" column="Domitory_NullNumber"/>
+            <result property="Domitory_Remarks" column="Domitory_Remarks"/>
+        </collection>
+    </resultMap>
+
+</mapper>

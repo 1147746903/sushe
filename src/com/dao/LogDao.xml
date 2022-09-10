@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper代理开发的规范
+1.Mapper接口接口的名称和对应Mapper.xml映射文件名称必须一直
+2.Mapper.xml文件的namespace与Mapper接口的类路径相同（即接口文件和映射文件需要放在同一包中）
+3.Mapper接口中的方法名和Mapper.xml中定义的每个执行语句的id相同
+4.Mapper接口中的输入参数类型和Mapper.xml中定义的每个sql的parameterType类型相同
+5.Mapper接口方法的输出参数类型要和Mapper.xml中定义的每个sql的resultType的类型相同 -->
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.dao.LogDao">
+    <!--查询所有寝室的缺寝记录-->
+    <select id="findAll" resultType="Log">
+        select log.* ,student.* ,domitory.Domitory_Name,teacher.Teacher_Name
+        from log  ,student, domitory ,teacher
+        where log.Log_StudentID=student.Student_ID
+          and log.Log_TeacherID=teacher.Teacher_ID
+          and student.Student_DomitoryID=domitory.Domitory_ID
+    </select>
+    <!--添加缺寝记录-->
+    <insert id="addLog" parameterType="Log">
+        insert into log (Log_StudentID,Log_TeacherID,Log_Date,Log_Remark)
+         values(#{Log_StudentID},#{Log_TeacherID},#{Log_Date},#{Log_Remark})
+    </insert>
+    <!--通过楼宇号查询学生的缺寝记录-->
+    <select id="findLog" parameterType="Integer" resultMap="DomitoryAndStudentLog">
+        select d.* ,s.* ,l.*
+        from
+        domitory d,
+		student s ,
+		log l
+		where  d.Domitory_ID=s.Student_DomitoryID
+         and   s.Student_ID=l.Log_StudentID
+		 and   d.Domitory_BuildingID=#{Domitory_BuildingID}
+    </select>
+    <!-- 自定义 手动映射类型 -->
+    <resultMap type="Domitory" id="DomitoryAndStudentLog">
+        <id property="Domitory_ID" column="Domitory_ID" />
+        <result property="Domitory_BuildingID" column="Domitory_BuildingID"/>
+        <result property="Domitory_Name" column="Domitory_Name"/>
+        <result property="Domitory_Number" column="Domitory_Number"/>
+        <result property="Domitory_NullNumber" column="Domitory_NullNumber"/>
+        <result property="Domitory_Remarks" column="Domitory_Remarks"/>
+        <!-- 多对多关联映射 ：collection-->
+        <collection property="studentList" ofType="Student">
+            <id property="Student_ID" column="Student_ID" />
+            <result property="Student_DomitoryID" column="Student_DomitoryID"/>
+            <result property="Student_Username" column="Student_Username"/>
+            <result property="Student_Password" column="Student_Password"/>
+            <result property="Student_Name" column="Student_Name"/>
+            <result property="Student_Sex" column="Student_Sex"/>
+            <result property="Student_Class" column="Student_Class"/>
+            <result property="Student_State" column="Student_State"/>
+            <collection property="logList" ofType="Log">
+                <id property="Log_ID" column="Log_ID" />
+                <result property="Log_StudentID" column="Log_StudentID"/>
+                <result property="Log_TeacherID" column="Log_TeacherID"/>
+                <result property="Log_Date" column="Log_Date"/>
+                <result property="Log_Remark" column="Log_Remark"/>
+            </collection>
+        </collection>
+    </resultMap>
+    <!--通过学号和寝室号查询缺寝记录-->
+    <select id="findLogByDid" parameterType="Student" resultMap="DomitoryAndStudentLog">
+        select d.* ,s.* ,l.*
+        from
+        domitory d,
+		student s ,
+		log l
+		where  d.Domitory_ID=s.Student_DomitoryID
+         and   s.Student_ID=l.Log_StudentID
+		 and Student_DomitoryID=#{Student_DomitoryID}
+         and Student_Username=#{Student_Username}
+    </select>
+    <!--通过寝室号码查询缺寝记录-->
+    <select id="findLogByDid2" parameterType="Student" resultMap="DomitoryAndStudentLog">
+        select d.* ,s.* ,l.*
+        from
+        domitory d,
+		student s ,
+		log l
+		where  d.Domitory_ID=s.Student_DomitoryID
+         and   s.Student_ID=l.Log_StudentID
+		 and Student_DomitoryID=#{Student_DomitoryID}
+    </select>
+    <!--学生端查询缺寝记录  -->
+    <select id="findLogByStudentId" parameterType="Student" resultMap="DomitoryAndStudentLog">
+        select d.* ,s.* ,l.*
+        from
+        domitory d,
+		student s ,
+		log l
+		where  d.Domitory_ID=s.Student_DomitoryID
+         and   s.Student_ID=l.Log_StudentID
+		 and Student_ID=#{Student_ID}
+    </select>
+</mapper>

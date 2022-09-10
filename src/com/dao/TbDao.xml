@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper代理开发的规范
+1.Mapper接口接口的名称和对应Mapper.xml映射文件名称必须一直
+2.Mapper.xml文件的namespace与Mapper接口的类路径相同（即接口文件和映射文件需要放在同一包中）
+3.Mapper接口中的方法名和Mapper.xml中定义的每个执行语句的id相同
+4.Mapper接口中的输入参数类型和Mapper.xml中定义的每个sql的parameterType类型相同
+5.Mapper接口方法的输出参数类型要和Mapper.xml中定义的每个sql的resultType的类型相同 -->
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.dao.TbDao">
+    <!--通过楼号查询楼宇管理员-->
+    <select id="findTBByBuildingId" parameterType="Integer" resultMap="BuildWithTeacher">
+        select t.* ,b.* from teacher
+		t,building b,tb
+		where tb.TB_TeacherID=t.Teacher_ID
+		and
+		tb.TB_BuildingID=b.Building_ID
+		and tb.TB_BuildingID=#{TB_BuildingID}
+    </select>
+    <!-- 自定义 手动映射类型 -->
+    <resultMap type="Building" id="BuildWithTeacher">
+          <id property="Building_ID" column="Building_ID" />
+           <result property="Building_Name" column="Building_Name"/>
+           <result property="Building_Introduction" column="Building_Introduction"/>
+        <!-- 多对多关联映射 ：collection-->
+        <collection property="teacherList" ofType="Teacher">
+            <id property="Teacher_ID" column="Teacher_ID" />
+            <result property="Teacher_Username" column="Teacher_Username"/>
+            <result property="Teacher_Password" column="Teacher_Password"/>
+            <result property="Teacher_Name" column="Teacher_Name"/>
+            <result property="Teacher_Sex" column="Teacher_Sex"/>
+            <result property="Teacher_Tel" column="Teacher_Tel"/>
+        </collection>
+    </resultMap>
+    <!--通过楼宇的id添加楼宇的管理员到该楼中-->
+    <insert id="addTeacherInBuildingId" parameterType="Integer" >
+        insert into tb (TB_TeacherID,TB_BuildingID) value(#{TB_TeacherID}, #{TB_BuildingID})
+    </insert>
+    <!--通过楼宇号和楼宇管理员的ID查找.防止重复添加-->
+    <select id="findTeacherInBuildingId" parameterType="Integer" resultType="TB">
+        select * from tb where TB_TeacherID=#{TB_TeacherID} and TB_BuildingID=#{TB_BuildingID}
+    </select>
+    <!--移除楼宇管理员-->
+    <delete id="deleteTeacherInBuildingId" parameterType="Integer">
+         delete from tb where TB_TeacherID=#{TB_TeacherID} and TB_BuildingID=#{TB_BuildingID}
+    </delete>
+</mapper>

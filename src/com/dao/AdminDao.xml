@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper代理开发的规范 
+1.Mapper接口接口的名称和对应Mapper.xml映射文件名称必须一直 
+2.Mapper.xml文件的namespace与Mapper接口的类路径相同（即接口文件和映射文件需要放在同一包中） 
+3.Mapper接口中的方法名和Mapper.xml中定义的每个执行语句的id相同 
+4.Mapper接口中的输入参数类型和Mapper.xml中定义的每个sql的parameterType类型相同 
+5.Mapper接口方法的输出参数类型要和Mapper.xml中定义的每个sql的resultType的类型相同 -->
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.dao.AdminDao">
+    <!--验证登陆 .通过账号和密码查询-->
+    <select id="CheckLogin" parameterType="String" resultType="admin">
+        select * from Admin where Admin_Username=#{username} and Admin_Password=#{password}
+    </select>
+     
+</mapper>

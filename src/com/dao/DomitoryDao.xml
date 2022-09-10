@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper代理开发的规范
+1.Mapper接口接口的名称和对应Mapper.xml映射文件名称必须一直
+2.Mapper.xml文件的namespace与Mapper接口的类路径相同（即接口文件和映射文件需要放在同一包中）
+3.Mapper接口中的方法名和Mapper.xml中定义的每个执行语句的id相同
+4.Mapper接口中的输入参数类型和Mapper.xml中定义的每个sql的parameterType类型相同
+5.Mapper接口方法的输出参数类型要和Mapper.xml中定义的每个sql的resultType的类型相同 -->
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.dao.DomitoryDao">
+    <!--查询所有寝室-->
+    <select id="findAll"  resultType="DB">
+        select * from domitory d ,building b where d.Domitory_BuildingID=b.Building_ID
+    </select>
+    <!--添加寝室-->
+    <insert id="addDomitory" parameterType="Domitory" >
+         insert into domitory(Domitory_BuildingID,Domitory_Name,Domitory_NullNumber,Domitory_Remarks)
+         values(#{Domitory_BuildingID},#{Domitory_Name},#{Domitory_NullNumber},#{Domitory_Remarks})
+    </insert>
+    <!--通过楼宇号和寝室号查询-->
+    <select id="findDomitoryByBuildingIdOrName" parameterType="DB" resultType="DB">
+        select * from domitory d,building b
+        where d.Domitory_BuildingID=b.Building_ID and Domitory_BuildingID=#{Domitory_BuildingID} and Domitory_Name=#{Domitory_Name}
+    </select>
+    <!--通过寝室号查询-->
+    <select id="findDomitoryName" parameterType="DB" resultType="DB">
+        select * from domitory d,building b
+        where d.Domitory_BuildingID=b.Building_ID and Domitory_Name=#{Domitory_Name}
+    </select>
+    <!--通过楼宇号查询-->
+    <select id="findDomitoryBuildingId" parameterType="DB" resultType="DB">
+        select * from domitory d,building b
+        where d.Domitory_BuildingID=b.Building_ID and Domitory_BuildingID=#{Domitory_BuildingID}
+    </select>
+    <!--通过宿舍号查询宿舍-->
+    <select id="findDomitoryById" parameterType="Integer" resultType="Domitory">
+        select * from domitory where Domitory_ID= #{Domitory_ID}
+    </select>
+    <!--通过id修改宿舍-->
+    <update id="DomitoryUpdateSave" parameterType="Domitory">
+        update domitory
+        <set> <!-- 会去掉多余的逗号 -->
+            Domitory_BuildingID=#{Domitory_BuildingID},
+            Domitory_Name=#{Domitory_Name},
+            Domitory_NullNumber=#{Domitory_NullNumber},
+            Domitory_Remarks=#{Domitory_Remarks},
+        </set>
+        where Domitory_ID= #{Domitory_ID}
+    </update>
+    <!--通过宿舍号删除宿舍-->
+    <delete id="deleteDomitoryById" parameterType="Integer">
+         delete from domitory where Domitory_ID= #{Domitory_ID}
+    </delete>
+    <!--通过楼宇查询寝室的学生-->
+    <select id="findDomitoryAndStudent" parameterType="Integer" resultMap="DomitoryAndStudent">
+        select d.* ,s.* from domitory
+		d ,student s
+		where s.Student_DomitoryID=d.Domitory_ID
+		and Domitory_BuildingID=#{Domitory_BuildingID}
+    </select>
+    <!-- 自定义 手动映射类型 -->
+    <resultMap type="Domitory" id="DomitoryAndStudent">
+        <id property="Domitory_ID" column="Domitory_ID" />
+        <result property="Domitory_BuildingID" column="Domitory_BuildingID"/>
+        <result property="Domitory_Name" column="Domitory_Name"/>
+        <result property="Domitory_Number" column="Domitory_Number"/>
+        <result property="Domitory_NullNumber" column="Domitory_NullNumber"/>
+        <result property="Domitory_Remarks" column="Domitory_Remarks"/>
+        <!-- 多对多关联映射 ：collection-->
+        <collection property="studentList" ofType="Student">
+            <id property="Student_ID" column="Student_ID" />
+            <result property="Student_DomitoryID" column="Student_DomitoryID"/>
+            <result property="Student_Username" column="Student_Username"/>
+            <result property="Student_Password" column="Student_Password"/>
+            <result property="Student_Name" column="Student_Name"/>
+            <result property="Student_Sex" column="Student_Sex"/>
+            <result property="Student_Class" column="Student_Class"/>
+            <result property="Student_State" column="Student_State"/>
+        </collection>
+    </resultMap>
+    <!--通过学号和寝室号查询-->
+    <select id="findDomitoryAndStudentByDomitoryId" parameterType="Student" resultMap="DomitoryAndStudent">
+        select d.* ,s.* from domitory
+		d ,student s
+        where s.Student_DomitoryID=d.Domitory_ID
+            and Student_DomitoryID=#{Student_DomitoryID}
+            and Student_Username=#{Student_Username}
+        </select>
+    <!--通过寝室号码查询-->
+    <select id="findDomitoryAndStudentByDomitoryId2" parameterType="Student" resultMap="DomitoryAndStudent">
+        select d.* ,s.* from domitory
+		d ,student s
+        where s.Student_DomitoryID=d.Domitory_ID
+            and Student_DomitoryID=#{Student_DomitoryID}
+        </select>
+    <!--查询学生和该学生的寝室信息-->
+    <select id="findStudentWithDomitoryById" parameterType="Integer" resultType="SD">
+         select d.* ,s.* from domitory
+		 d ,student s
+         where s.Student_DomitoryID=d.Domitory_ID
+         and Student_ID=#{Student_ID}
+        </select>
+</mapper>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper代理开发的规范 
+1.Mapper接口接口的名称和对应Mapper.xml映射文件名称必须一直 
+2.Mapper.xml文件的namespace与Mapper接口的类路径相同（即接口文件和映射文件需要放在同一包中） 
+3.Mapper接口中的方法名和Mapper.xml中定义的每个执行语句的id相同 
+4.Mapper接口中的输入参数类型和Mapper.xml中定义的每个sql的parameterType类型相同 
+5.Mapper接口方法的输出参数类型要和Mapper.xml中定义的每个sql的resultType的类型相同 -->
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.dao.StudentDao">
+    <!--验证登陆 .通过账号和密码查询-->
+    <select id="CheckLogin" parameterType="String" resultType="Student">
+        select * from student where Student_Username=#{username} and Student_Password=#{password}
+    </select>
+    <!--查询所有的学生-->
+    <select id="findAll" resultType="Student">
+        select * from student
+    </select>
+    <!--添加学生-->
+    <insert id="addStudent" parameterType="Student">
+        insert into student(Student_Username,Student_Password,Student_Name,Student_Sex,Student_Class)
+         values(#{Student_Username},#{Student_Password},#{Student_Name},#{Student_Sex},#{Student_Class})
+    </insert>
+    <!--通过学号查询学生-->
+    <select id="findStudentByUsername" parameterType="String" resultType="Student">
+        select * from student where Student_Username= #{Student_Username}
+    </select>
+    <!--通过id查询学生-->
+    <select id="findStudentById" parameterType="Integer" resultType="Student">
+        select * from student where Student_ID= #{Student_ID}
+    </select>
+    <!--通过id修改学生-->
+    <update id="StudentUpdateSave" parameterType="Student">
+        update student
+        <set> <!-- 会去掉多余的逗号 -->
+            Student_Username=#{Student_Username},
+            <if test="Student_Password !=null and Student_Password != ''">
+                Student_Password=#{Student_Password},
+            </if>
+            Student_Name=#{Student_Name},
+            Student_Sex=#{Student_Sex},
+            Student_Class=#{Student_Class},
+        </set>
+        where Student_ID=#{Student_ID}
+    </update>
+    <!--通过名字查询学生-->
+    <select id="findStudentByName" parameterType="String" resultType="Student">
+        select * from student where Student_Name= #{Student_Name}
+    </select>
+    <!--通过班级查询学生-->
+    <select id="findStudentByClass" parameterType="String" resultType="Student">
+        select * from student where Student_Class= #{Student_Class}
+    </select>
+    <!--通过学号查询学生-->
+    <select id="findStudentByUserId" parameterType="String" resultType="Student">
+        select * from student where Student_Username= #{Student_Username}
+    </select>
+    <!--通过id删除楼宇管理员信息-->
+    <delete id="deleteStudentById" parameterType="Integer">
+         delete from student where Student_ID=#{Student_ID}
+    </delete>
+    <!--通过宿舍号查询所有的学生-->
+    <select id="findStudentByDomitoryId" parameterType="Integer" resultType="Student">
+        select * from student where Student_DomitoryID= #{Domitory_ID}
+    </select>
+   <!-- 添加学生到寝室-->
+    <update id="addStudentInDomitory" parameterType="Student">
+        update student
+        <set> <!-- 会去掉多余的逗号 -->
+            Student_DomitoryID=#{Student_DomitoryID},
+            Student_State='入住',
+        </set>
+        where Student_Username=#{Student_Username}
+    </update>
+    <!--查询学生是否入住-->
+    <select id="findStudendState" parameterType="String" resultType="String">
+         select Student_State from student where Student_Username= #{Student_Username}
+    </select>
+    <!--填加学生到宿舍 寝室人数加以空床数减一-->
+    <update id="updateDomitoryjiay" parameterType="Integer">
+        update domitory
+            set
+            Domitory_Number=Domitory_Number+1,
+            Domitory_NullNumber= Domitory_NullNumber-1
+        where Domitory_ID=#{Domitory_ID}
+    </update>
+    <!--寝室人数减一,空床数加一-->
+    <update id="updateDomitoryjiany" parameterType="Integer">
+        update domitory
+            set
+            Domitory_Number=Domitory_Number-1,
+            Domitory_NullNumber=Domitory_NullNumber+1
+        where Domitory_ID=#{Domitory_ID}
+    </update>
+    <!--查询寝室空床数-->
+    <select id="selectDomitoryNullNumber" parameterType="Integer" resultType="Integer">
+        select Domitory_NullNumber from domitory  where Domitory_ID=#{Domitory_ID}
+    </select>
+    <!--查询学生信息和所在楼宇和寝室的信息-->
+    <select id="findStudentAndDomitory" parameterType="String" resultType="Student">
+        select s.* ,b.Building_Name ,d.Domitory_Name
+        from student s,building b,domitory d
+		where s.Student_DomitoryID=d.Domitory_ID
+		and d.Domitory_BuildingID=b.Building_ID
+
+		and Student_Username=#{Student_Username}
+    </select>
+    <!--修改学生的寝室号-->
+    <update id="updateStudentTH" parameterType="Student">
+        update student
+            set
+            Student_DomitoryID=#{Student_DomitoryID}
+        where Student_ID=#{Student_ID}
+    </update>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+	<!-- 定义组件扫描器，指定需要扫描的包 -->
+	<context:component-scan
+		base-package="com.controller" />
+
+	<!-- 加载静态资源 -->
+	<mvc:resources location="/js/" mapping="/js/**"/>
+	<mvc:resources location="/Images/" mapping="/Images/**"/>
+	<mvc:resources location="/Style/" mapping="/Style/**"/>
+	<mvc:resources location="/My97DatePicker/" mapping="/My97DatePicker/**"/>
+
+	<!--扫描驱动 ，没有就404-->
+	<mvc:annotation-driven />
+	
+    <!--定义视图解析器  两个属性分别是前缀，后缀 -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 前缀 -->
+		<property name="prefix" value="/"></property>
+		<!-- 后缀 -->
+	    <property name="suffix" value=".jsp"></property>	
+	</bean>
+	<!--配置拦截器-->
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<mvc:exclude-mapping path="/Images/**"/>
+			<bean class="com.interceptor.LoginInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+</beans>

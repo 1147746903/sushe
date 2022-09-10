@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper  
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper代理开发的规范 
+1.Mapper接口接口的名称和对应Mapper.xml映射文件名称必须一直 
+2.Mapper.xml文件的namespace与Mapper接口的类路径相同（即接口文件和映射文件需要放在同一包中） 
+3.Mapper接口中的方法名和Mapper.xml中定义的每个执行语句的id相同 
+4.Mapper接口中的输入参数类型和Mapper.xml中定义的每个sql的parameterType类型相同 
+5.Mapper接口方法的输出参数类型要和Mapper.xml中定义的每个sql的resultType的类型相同 -->
+
+<!-- namespace表示命名空间 -->
+<mapper namespace="com.dao.TeacherDao">
+    <!--验证登陆 .通过账号和密码查询-->
+    <select id="CheckLogin" parameterType="String" resultType="Teacher">
+        select * from teacher where Teacher_Username=#{username} and Teacher_Password=#{password}
+    </select>
+    <!--查询所有的楼宇管理员-->
+    <select id="findAll" resultType="Teacher">
+        select * from teacher
+    </select>
+    <!--添加楼宇管理员-->
+    <insert id="addTeacher" parameterType="Teacher" >
+         insert into teacher(Teacher_Username,Teacher_Password,Teacher_Name,Teacher_Sex,Teacher_Tel)
+         values(#{Teacher_Username},#{Teacher_Password},#{Teacher_Name},#{Teacher_Sex},#{Teacher_Tel})
+    </insert>
+    <!--通过用户名查询楼宇管理员-->
+    <select id="findTeacherByUsername" parameterType="String" resultType="Teacher">
+         select * from teacher where Teacher_Username= #{username}
+    </select>
+    <!--通过id查询楼宇管理员-->
+    <select id="findTeacherById" parameterType="Integer" resultType="Teacher">
+        select * from teacher where Teacher_ID= #{id}
+    </select>
+    <!--通过id修改楼宇管理员-->
+    <update id="TeacherUpdateSave" parameterType="Teacher">
+         update teacher
+        <set> <!-- 会去掉多余的逗号 -->
+                Teacher_Username=#{Teacher_Username},
+            <if test="Teacher_Password !=null and Teacher_Password != ''">
+                Teacher_Password=#{Teacher_Password},
+            </if>
+            Teacher_Name=#{Teacher_Name},
+            Teacher_Sex=#{Teacher_Sex},
+            Teacher_Tel=#{Teacher_Tel},
+        </set>
+        where Teacher_ID=#{Teacher_ID}
+    </update>
+    <!--通过名字查询楼宇管理员-->
+    <select id="findTeacherByName" parameterType="String" resultType="Teacher">
+        select * from teacher where Teacher_Name= #{Teacher_Name}
+    </select>
+    <!--通过电话查询楼宇管理员-->
+    <select id="findTeacherByTel" parameterType="String" resultType="Teacher">
+        select * from teacher where Teacher_Tel= #{Teacher_Tel}
+    </select>
+    <!--通过用户名查询楼宇管理员-->
+    <select id="findTeacherByUserId" parameterType="String" resultType="Teacher">
+        select * from teacher where Teacher_Username= #{Teacher_Username}
+    </select>
+    <!--通过id删除楼宇管理员信息-->
+    <delete id="deleteTeacherById" parameterType="Integer">
+         delete from teacher where Teacher_ID=#{Teacher_ID}
+    </delete>
+</mapper>
